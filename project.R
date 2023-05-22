@@ -9,6 +9,8 @@ library(aTSA)
 library(car)
 library(seasonal)
 library(forecast)
+library(kableExtra)
+library(formattable)
 library(tidyverse)
 
 ###############################################################
@@ -119,7 +121,9 @@ testdf(variable = residuals(cointegration), max.augmentations = 3)
 # which defines the cointegrating relationship as: 
 # residuals = 1 * first - 152.195497 + 0.271123 * second
 
-cointegrated_series <- as.xts(residuals(cointegration))
+cointegrated_series <- lag.xts(residuals(cointegration))
+
+chosen_ones$lag_resid_coint <- cointegrated_series
 
 plot(cointegrated_series)
 
@@ -391,6 +395,7 @@ arima614fixed_forecast_data_xts <- xts(arima614fixed_forecast_data, order.by = d
 ###############################################################
 #5 Forecast visualization
 data_all_xts <- rbind(data_train_xts[,3], data_test_xts[,3])
+names(data_all_xts) <- "first"
 
 ARIMA_forecasts_first <- merge(data_all_xts,
                                arima613fixed2_forecast_data_xts,
@@ -588,6 +593,7 @@ arima313_second_forecast_data_xts <- xts(arima313_second_forecast_data, order.by
 ########################################################
 #VISUALIZATION OF THE SECOND TIME SERIES
 data_all_second_xts <- rbind(data_train_xts[,9], data_test_xts[,9])
+names(data_all_second_xts) <- "second"
 
 ARIMA_forecasts_second <- merge(data_all_second_xts,
                                arima1513_fixed_second_forecast_data_xts,
@@ -609,15 +615,313 @@ plot(ARIMA_forecasts_second["2020-11/",],
 
 
 ######################################
-#WE NEED A VAR LAG ORDER FIRST
+#ECM and VECM
+
+ecm_model <- lm(diff_first ~ diff_second + lag_resid_coint, data = chosen_ones)
+
+#lets delete the intercept
+
+ecm_model <- lm(diff_first ~ diff_second + lag_resid_coint -1, data = chosen_ones)
+
+summary(ecm_model)
+#diff_second is not statistically significant, but lets leave it
+
+
+# The parameter -0.03568 describes a short term relationship 
+# between `first` and `second`, so if `second` increases by 1 then 
+# the `first` in the **short run** will decrease by 0.03568.
+
+# The long run relationship is described by the parameter 
+# 0.271123 from the cointegrating relationship: so if `ppi` 
+# increases by 1 in the LONG RUN `cpi` will increase by 0.271123.
+
+# The value of -0.55365 is the estimate of the *adjustment 
+# coefficient*. As expected, its sign is negative and 
+# this value means that about 55.37% of the unexpected error 
+# (increase in gap) will be corrected in the next period, 
+# so any unexpected deviation should be corrected finally 
+# on average within about 1.8 periods.
+
+#GRANGER CAUSALITY TEST
+
+grangertest(first ~ second,
+            data = chosen_ones,
+            order = 3)
+#second causes first (we rejected null hypothesis about no causality)
+
+grangertest(second ~ first,
+            data = chosen_ones,
+            order = 3)
+#first causes second (we rejected null hypothesis about no causality)
+
+
+for(i in 1:5){
+  print(i)
+  print("first ~ second")
+  print(grangertest(first ~ second,
+                    data = chosen_ones,
+                    order = i))
+  print(i)
+  print("second ~ first")
+  print(grangertest(second ~ first,
+              data = chosen_ones,
+              order = i))
+}
+#Conclusion - we have bi-directional feedback in all cases
+
+#VAR MODELS
+
+#Lets select VAR model with proper lag legnht
+VARselect(chosen_ones[,1:2], lag.max = 10) %>%
+  .$criteria %>% 
+  t() %>% 
+  as_tibble() %>% 
+  mutate(nLags = 1:nrow(.)) %>%
+  kbl(digits = 3) %>%
+  kable_classic("striped", full_width = F)
+#6 lags are the best according to all information criterias
+
+#Lets check IC with seasonal VAR
+
+VARselect(chosen_ones[,1:2], lag.max = 10, season = 12) %>%
+  .$criteria %>% 
+  t() %>% 
+  as_tibble() %>% 
+  mutate(nLags = 1:nrow(.)) %>%
+  kbl(digits = 3) %>%
+  kable_classic("striped", full_width = F)
+#All but one (FPE IC) shows that 6 lags are the best
+#With ACF and PACF we showed that there is no seasonality detected
+
+#But still let's check it:
+VAR_model_6_lags <- VAR(chosen_ones[,1:2],
+                    p = 6,
+                    season = 12)
+
+summary(VAR_model_6_lags)
+#all seasonal variables are not statistically significant
+
+VAR_model_6_lags <- VAR(chosen_ones[,1:2],
+                        p = 6)
+
+summary(VAR_model_6_lags)
+#some variables are not significant, but in general all lag orders have some significant part
+
+plot(VAR_model_6_lags)
+#ACF and PACF for first looks good, but for second both ACF and PACF have lag 8 on the line so lets make a model with 8 lags
+VAR_model_8_lags <- VAR(chosen_ones[,1:2],
+                        p = 8)
+
+summary(VAR_model_8_lags)
+#lags 7 and 8 are not significant
+
+plot(VAR_model_8_lags)
+#ACF and PACF in both cases looks good
+
+#lets look at the residuals
+serial.test(VAR_model_6_lags)
+
+serial.test(VAR_model_8_lags)
+#Both models show no autocorrelation in residuals
+
+
+#AIC/BIC
+AIC(VAR_model_6_lags, VAR_model_8_lags)
+BIC(VAR_model_6_lags, VAR_model_8_lags)
+
+#AIC prefers model with 8 lags, but BIC prefers model with 6 lags, lets stick to 6 lags, because as we showed earlier adding more lags gives us nonsignificant variables
+
+#IRF
+plot(irf(VAR_model_6_lags, n.ahead = 36))
+
+#FEVD
+plot(fevd(VAR_model_6_lags, n.ahead = 36))
+
+#JOHANSON COINTEGRATION TEST
+
 johan.test.trace <- 
-  ca.jo(chosen_ones[,1:2], # data 
-        ecdet = "trend", # "none" for no intercept in cointegrating equation, 
-        # "const" for constant term in cointegrating equation and 
-        # "trend" for trend variable in cointegrating equation
+  ca.jo(chosen_ones[,1:2],
+        ecdet = "trend",
         type = "trace",  # type of the test: trace or eigen
-        K = 2,           # lag order of the series (levels) in the VAR
-        season = 12) 
+        K = 6) # lags in VAR model
 summary(johan.test.trace)
-?ca.jo
+
+cbind(summary(johan.test.trace)@teststat, summary(johan.test.trace)@cval)
+#exactly one cointegrated vector
+
+#lets change type to eigen
+johan.test.eigen <- 
+  ca.jo(chosen_ones[,1:2],
+        ecdet = "trend",
+        type = "eigen",  # type of the test: trace or eigen
+        K = 6) # lags in VAR model
+summary(johan.test.eigen)
+
+cbind(summary(johan.test.eigen)@teststat, summary(johan.test.eigen)@cval)
+#same interpretation
+
+#VECM
+
+VECM_model <- cajorls(johan.test.trace, # defined specification
+                                     r = 1) # number of cointegrating vectors
+
+summary(VECM_model$rlm)
+#only etc1 not significant in first equation
+
+VECM_model$beta
+
+# We can reparametrize the VEC model into VAR 
+# (here we use the specification object):
+
+VECM_model.asVAR <- vec2var(johan.test.trace, r = 1)
+
+# Lets see the result:
+
+VECM_model.asVAR
+
+# Based on the reparametrized model, we can calculate 
+# and plot Impulse Response Functions:
+
+plot(irf(VECM_model.asVAR, n.ahead = 36))
+
+# We can also perform variance decomposition:
+
+plot(fevd(VECM_model.asVAR, n.ahead = 36))
+
+# The results are pretty similar to the earlier `VAR(6)` 
+# model.
+
+# Let's also check if model residuals are autocorrelated.
+
+# Residuals can be extracted only from the VAR 
+# reparametrized model.
+
+head(residuals(VECM_model.asVAR))
+serial.test(VECM_model.asVAR)
+
+# The null is not rejected, residuals are not autocorrelated.
+
+# You can see the ACF and PACF functions by plotting 
+# the results of the `serial.test()`
+
+plot(serial.test(VECM_model.asVAR))
+#8 lag in PACF of residuals and squared Residuals in second model seems significant
+
+#lets plot EDF (Empirical Distribution Function) better
+
+VECM_model.asVAR %>%
+  residuals() %>%
+  as_tibble() %>%
+  ggplot(aes(`resids of first`)) +
+  geom_histogram(aes(y =..density..),
+                 colour = "black", 
+                 fill = "pink") +
+  stat_function(fun = dnorm, 
+                args = list(mean = mean(residuals(VECM_model.asVAR)[, 1]), 
+                            sd = sd(residuals(VECM_model.asVAR)[, 1]))) +
+  theme_bw() + 
+  labs(
+    title = "Density of PPI residuals", 
+    y = "", x = "",
+    caption = "source: own calculations"
+  )
+
+VECM_model.asVAR %>%
+  residuals() %>%
+  as_tibble() %>%
+  ggplot(aes(`resids of second`)) +
+  geom_histogram(aes(y =..density..),
+                 colour = "black", 
+                 fill = "pink") +
+  stat_function(fun = dnorm, 
+                args = list(mean = mean(residuals(VECM_model.asVAR)[, 2]), 
+                            sd = sd(residuals(VECM_model.asVAR)[, 2]))) +
+  theme_bw() + 
+  labs(
+    title = "Density of CPI residuals", 
+    y = "", x = "",
+    caption = "source: own calculations"
+  )
+
+
+#lets use Jarque-Bera multivariate test to check for normality in residuals
+normality.test(VECM_model.asVAR)
+#null about normality is not rejected!!!
+
+VECM_model.asVAR.fore <- 
+  predict(
+    VECM_model.asVAR,     # no of cointegrating vectors 
+    n.ahead = 30, # forecast horizon
+    ci = 0.95)
+
+
+# VECM forecasts for `first`:
+
+VECM_model.asVAR.fore$fcst$first
+
+# VECM forecasts for `second`:
+
+VECM_model.asVAR.fore$fcst$second
+
+
+VECM_first_forecast <- xts(VECM_model.asVAR.fore$fcst$first[,-4], order.by = data_test$X)
+
+VECM_second_forecast <- xts(VECM_model.asVAR.fore$fcst$second[,-4], order.by = data_test$X)
+
+
+names(VECM_first_forecast) <- c("first_fore", "first_lower", "first_upper")
+
+names(VECM_second_forecast) <- c("second_fore", "second_lower", "second_upper")
+
+
+VECM_first_all_data <- merge(data_all_xts,
+                             data_all_second_xts,
+                             VECM_first_forecast,
+                             VECM_second_forecast)
+
+plot(VECM_first_all_data["2020-11/", c("first", "first_fore",
+                        "first_lower", "first_upper")], 
+     major.ticks = "years", 
+     grid.ticks.on = "years",
+     grid.ticks.lty = 3,
+     main = "30 months (?) forecast of first",
+     col = c("black", "blue", "red", "red"))
+
+plot(VECM_first_all_data["2020-11/", c("second", "second_fore",
+                        "second_lower", "second_upper")], 
+     major.ticks = "years", 
+     grid.ticks.on = "years",
+     grid.ticks.lty = 3,
+     main = "30 months (?) forecast of second",
+     col = c("black", "blue", "red", "red"))
+
+
+#WITH ARIMA MODELS
+
+forecasts_first_all <- merge(ARIMA_forecasts_first,
+                             VECM_first_forecast)
+
+forecasts_second_all <- merge(ARIMA_forecasts_second,
+                             VECM_second_forecast)
+
+
+
+#first
+plot(forecasts_first_all["2020-11/",], 
+     major.ticks = "years", 
+     grid.ticks.on = "years",
+     grid.ticks.lty = 3,
+     main = "30 day forecast of chosen time series",
+     col = c("black", "blue", "red", "red", "green", "pink", "pink", "cyan", "magenta", "magenta", "orange", "yellow", "yellow"),
+     legend.loc = "bottomleft")
+
+#second
+plot(forecasts_second_all["2020-11/",], 
+     major.ticks = "years", 
+     grid.ticks.on = "years",
+     grid.ticks.lty = 3,
+     main = "30 day forecast of chosen time series",
+     col = c("black", "blue", "red", "red", "green", "pink", "pink", "cyan", "magenta", "magenta", "orange", "yellow", "yellow"),
+     legend.loc = "bottomleft")
+
 
