@@ -685,7 +685,7 @@ VARselect(chosen_ones[,1:2], lag.max = 10) %>%
 
 #Lets check IC with seasonal VAR
 
-VARselect(chosen_ones[,1:2], lag.max = 10, season = 12) %>%
+VARselect(chosen_ones[,1:2], lag.max = 10, season = 31) %>%
   .$criteria %>% 
   t() %>% 
   as_tibble() %>% 
@@ -698,7 +698,7 @@ VARselect(chosen_ones[,1:2], lag.max = 10, season = 12) %>%
 #But still let's check it:
 VAR_model_6_lags <- VAR(chosen_ones[,1:2],
                     p = 6,
-                    season = 12)
+                    season = 31)
 
 summary(VAR_model_6_lags)
 #all seasonal variables are not statistically significant
