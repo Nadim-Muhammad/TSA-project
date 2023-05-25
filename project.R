@@ -19,7 +19,7 @@ library(tidyverse)
 #1. Getting data
 
 
-setwd("C:\\Users\\Administrator\\OneDrive\\Pulpit\\studia\\MAGISTERSKIE\\Time Series Analysis\\project\\TSA-project")
+setwd("C:\\Users\\nm412083\\Desktop\\Time Series Analysis\\project\\TSA-project-main\\TSA-project")
 
 
 
@@ -695,13 +695,27 @@ VARselect(chosen_ones[,1:2], lag.max = 10, season = 31) %>%
 #All but one (FPE IC) shows that 6 lags are the best
 #With ACF and PACF we showed that there is no seasonality detected
 
-#But still let's check it:
+#But still let's check it (lets check season = 31, 30, 7:
 VAR_model_6_lags <- VAR(chosen_ones[,1:2],
-                    p = 6,
-                    season = 31)
+                        p = 6,
+                        season = 31)
 
 summary(VAR_model_6_lags)
-#all seasonal variables are not statistically significant
+#only sd10 in first is on the line of significance
+
+VAR_model_6_lags <- VAR(chosen_ones[,1:2],
+                        p = 6,
+                        season = 30)
+
+summary(VAR_model_6_lags)
+#only sd12 in first is on the line of significance
+
+VAR_model_6_lags <- VAR(chosen_ones[,1:2],
+                        p = 6,
+                        season = 7)
+
+summary(VAR_model_6_lags)
+#only sd3 in first is statistically significant
 
 VAR_model_6_lags <- VAR(chosen_ones[,1:2],
                         p = 6)
