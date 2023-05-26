@@ -19,8 +19,7 @@ library(tidyverse)
 #1. Getting data
 
 
-setwd("C:\\Users\\Administrator\\OneDrive\\Pulpit\\studia\\MAGISTERSKIE\\Time Series Analysis\\project\\TSA-project")
-
+setwd("C:/Users/micha/OneDrive/Dokumenty/GitHub/TSA-project/")
 
 
 options(scipen = 10)
@@ -107,7 +106,7 @@ testdf(variable = chosen_ones$diff_second,
 #Both series integrated of order one (I(1))
 
 ###############################################################
-#2.1 Checking for cointegration relation
+## 2.1 Checking for cointegration relation
 
 cointegration <- lm(first ~ second, data = chosen_ones)
 
