@@ -1225,3 +1225,162 @@ names(forecasts_first_all)
 names(forecasts_second_all)
 ```
 
+## First
+
+```{r}
+errors_first_ts <- {}
+```
+
+### ARIMA(6,1,3)
+```{r}
+errors_first_ts$arima613mae   <-  mae(forecasts_first_all[971:1000,1],forecasts_first_all$arima613.mean)
+errors_first_ts$arima613mse   <-  mse(forecasts_first_all[971:1000,1],forecasts_first_all$arima613.mean)
+errors_first_ts$arima613mape  <-  mape(forecasts_first_all[971:1000,1],forecasts_first_all$arima613.mean)
+errors_first_ts$arima613amape <-  mean(abs((forecasts_first_all[971:1000,1] - forecasts_first_all$arima613.mean) / 
+                                        (forecasts_first_all[971:1000,1] + forecasts_first_all$arima613.mean)))
+```
+
+### ARIMA(7,1,3)
+```{r}
+errors_first_ts$arima713mae   <-  mae(forecasts_first_all[971:1000,1],forecasts_first_all$arima713.mean)
+errors_first_ts$arima713mse   <-  mse(forecasts_first_all[971:1000,1],forecasts_first_all$arima713.mean)
+errors_first_ts$arima713mape  <-  mape(forecasts_first_all[971:1000,1],forecasts_first_all$arima713.mean)
+errors_first_ts$arima713amape <-  mean(abs((forecasts_first_all[971:1000,1] - forecasts_first_all$arima713.mean) / 
+                                             (forecasts_first_all[971:1000,1] + forecasts_first_all$arima713.mean)))
+```
+
+### ARIMA(6,1,4)
+
+```{r}
+errors_first_ts$arima614mae   <-  mae(forecasts_first_all[971:1000,1],forecasts_first_all$arima614.mean)
+errors_first_ts$arima614mse   <-  mse(forecasts_first_all[971:1000,1],forecasts_first_all$arima614.mean)
+errors_first_ts$arima614mape  <-  mape(forecasts_first_all[971:1000,1],forecasts_first_all$arima614.mean)
+errors_first_ts$arima614amape <-  mean(abs((forecasts_first_all[971:1000,1] - forecasts_first_all$arima614.mean) / 
+                                             (forecasts_first_all[971:1000,1] + forecasts_first_all$arima614.mean)))
+```
+
+### VECM
+```{r}
+errors_first_ts$VECM_mae   <-  mae(forecasts_first_all[971:1000,1],forecasts_first_all$first_fore)
+errors_first_ts$VECM_mse   <-  mse(forecasts_first_all[971:1000,1],forecasts_first_all$first_fore)
+errors_first_ts$VECM_mape  <-  mape(forecasts_first_all[971:1000,1],forecasts_first_all$first_fore)
+errors_first_ts$VECM_amape <-  mean(abs((forecasts_first_all[971:1000,1] - forecasts_first_all$first_fore) / 
+                                             (forecasts_first_all[971:1000,1] + forecasts_first_all$first_fore)))
+
+errors_first_ts
+```
+
+### MAE
+```{r}
+errors_first_ts$arima613mae
+errors_first_ts$arima713mae
+errors_first_ts$arima614mae
+errors_first_ts$VECM_mae
+```
+arima(6,1,4) the best in terms of MAE
+
+### MSE
+```{r}
+errors_first_ts$arima613mse
+errors_first_ts$arima713mse
+errors_first_ts$arima614mse
+errors_first_ts$VECM_mse
+```
+arima(6,1,4) the best in terms of MSE
+
+### MAPE
+```{r}
+errors_first_ts$arima613mape
+errors_first_ts$arima713mape
+errors_first_ts$arima614mape
+errors_first_ts$VECM_mape
+```
+arima(6,1,4) the best in terms of MAPE
+
+### AMAPE
+```{r}
+errors_first_ts$arima613amape
+errors_first_ts$arima713amape
+errors_first_ts$arima614amape
+errors_first_ts$VECM_amape
+```
+arima(6,1,4) the best in terms of AMAPE
+
+
+## SECOND
+```{r}
+errors_second_ts <- {}
+```
+
+### ARIMA(15,1,3) fixed
+```{r}
+errors_second_ts$arima1513_fixed_mae   <-  mae(forecasts_second_all[971:1000,1],forecasts_second_all$arima1513_fixed.mean)
+errors_second_ts$arima1513_fixed_mse   <-  mse(forecasts_second_all[971:1000,1],forecasts_second_all$arima1513_fixed.mean)
+errors_second_ts$arima1513_fixed_mape  <-  mape(forecasts_second_all[971:1000,1],forecasts_second_all$arima1513_fixed.mean)
+errors_second_ts$arima1513_fixed_amape <-  mean(abs((forecasts_second_all[971:1000,1] - forecasts_second_all$arima1513_fixed.mean) / 
+                                             (forecasts_second_all[971:1000,1] + forecasts_second_all$arima1513_fixed.mean)))
+```
+
+### ARIMA(15,1,3) fixed2
+```{r}
+errors_second_ts$arima1513_fixed2_mae   <-  mae(forecasts_second_all[971:1000,1],forecasts_second_all$arima1513_fixed2.mean)
+errors_second_ts$arima1513_fixed2_mse   <-  mse(forecasts_second_all[971:1000,1],forecasts_second_all$arima1513_fixed2.mean)
+errors_second_ts$arima1513_fixed2_mape  <-  mape(forecasts_second_all[971:1000,1],forecasts_second_all$arima1513_fixed2.mean)
+errors_second_ts$arima1513_fixed2_amape <-  mean(abs((forecasts_second_all[971:1000,1] - forecasts_second_all$arima1513_fixed2.mean) / 
+                                                     (forecasts_second_all[971:1000,1] + forecasts_second_all$arima1513_fixed2.mean)))
+```
+
+### ARIMA(3,1,3)
+```{r}
+errors_second_ts$arima313_mae   <-  mae(forecasts_second_all[971:1000,1],forecasts_second_all$arima313.mean)
+errors_second_ts$arima313_mse   <-  mse(forecasts_second_all[971:1000,1],forecasts_second_all$arima313.mean)
+errors_second_ts$arima313_mape  <-  mape(forecasts_second_all[971:1000,1],forecasts_second_all$arima313.mean)
+errors_second_ts$arima313_amape <-  mean(abs((forecasts_second_all[971:1000,1] - forecasts_second_all$arima313.mean) / 
+                                                     (forecasts_second_all[971:1000,1] + forecasts_second_all$arima313.mean)))
+```
+
+### VECM
+```{r}
+errors_second_ts$VECM_mae   <-  mae(forecasts_second_all[971:1000,1],forecasts_second_all$second_fore)
+errors_second_ts$VECM_mse   <-  mse(forecasts_second_all[971:1000,1],forecasts_second_all$second_fore)
+errors_second_ts$VECM_mape  <-  mape(forecasts_second_all[971:1000,1],forecasts_second_all$second_fore)
+errors_second_ts$VECM_amape <-  mean(abs((forecasts_second_all[971:1000,1] - forecasts_second_all$second_fore) / 
+                                              (forecasts_second_all[971:1000,1] + forecasts_second_all$second_fore)))
+```
+
+### MAE
+```{r}
+errors_second_ts$arima1513_fixed_mae
+errors_second_ts$arima1513_fixed2_mae
+errors_second_ts$arima313_mae
+errors_second_ts$VECM_mae
+```
+ARIMA(15,1,3) fixed best in terms of MAE
+
+
+### MSE
+```{r}
+errors_second_ts$arima1513_fixed_mse
+errors_second_ts$arima1513_fixed2_mse
+errors_second_ts$arima313_mse
+errors_second_ts$VECM_mse
+```
+ARIMA(15,1,3) fixed best in terms of MSE
+
+### MAPE
+```{r}
+errors_second_ts$arima1513_fixed_mape
+errors_second_ts$arima1513_fixed2_mape
+errors_second_ts$arima313_mape
+errors_second_ts$VECM_mape
+```
+ARIMA(15,1,3) fixed best in terms of MAPE
+
+### AMAPE
+```{r}
+errors_second_ts$arima1513_fixed_amape
+errors_second_ts$arima1513_fixed2_amape
+errors_second_ts$arima313_amape
+errors_second_ts$VECM_amape
+```
+ARIMA(15,1,3) fixed best in terms of AMAPE
