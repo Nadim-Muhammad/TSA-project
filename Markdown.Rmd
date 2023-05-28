@@ -35,7 +35,7 @@ library(tidyverse)
 # 1.Getting data
 
 ```{r}
-setwd("C:/Users/micha/OneDrive/Dokumenty/GitHub/TSA-project/")
+setwd("C:\\Users\\Administrator\\OneDrive\\Pulpit\\studia\\MAGISTERSKIE\\Time Series Analysis\\project\\TSA-project")
 
 options(scipen = 10)
 
@@ -106,7 +106,9 @@ chosen_ones$second<- data_train_xts[,9]
 plot(chosen_ones)
 ```
 
-first testdf(variable = chosen_ones\$first, max.augmentations = 3)
+```{r warning=FALSE}
+testdf(variable = chosen_ones$first, max.augmentations = 3)
+```
 
 ```{r}
 chosen_ones$diff_first <- diff.xts(chosen_ones$first) 
@@ -117,7 +119,9 @@ chosen_ones$diff_second <- diff.xts(chosen_ones$second)
 testdf(variable = chosen_ones$first, max.augmentations = 3)
 ```
 
-second testdf(variable = chosen_ones\$second, max.augmentations = 3)
+```{r warning=FALSE}
+testdf(variable = chosen_ones$second, max.augmentations = 3)
+```
 
 ```{r warning=FALSE}
 testdf(variable = chosen_ones$diff_second, max.augmentations = 3)
@@ -139,23 +143,13 @@ summary(cointegration)
 testdf(variable = residuals(cointegration), max.augmentations = 3)
 ```
 
-```{r}
-cointegration <- lm(first ~ second, data = chosen_ones)
 
-summary(cointegration)
-
-```
-
-```{r warning=FALSE}
-testdf(variable = residuals(cointegration), max.augmentations = 3)
-```
-
-Coefficients: 
+Coefficients: \
 Estimate Std. Error t value Pr(>|t|)\
-(Intercept) 152.195497 0.107127 1420.7 <2e-16 ***
-second -0.271123 0.002145 -126.4 <2e-16***
-The cointegrating vector is: 1, -152.195497, 0.271123 which defines the cointegrating relationship as:
-residuals = 1 * first - 152.195497 + 0.271123 * second
+(Intercept) 152.195497 0.107127 1420.7 <2e-16 *** \
+second -0.271123 0.002145 -126.4 <2e-16*** \
+The cointegrating vector is: 1, -152.195497, 0.271123 which defines the cointegrating relationship as: \
+residuals = 1 * first - 152.195497 + 0.271123 * second \
 
 ```{r}
 cointegrated_series <- lag.xts(residuals(cointegration))
