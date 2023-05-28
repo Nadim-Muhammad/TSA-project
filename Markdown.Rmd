@@ -1,15 +1,14 @@
 ---
-title: "Rmarkdown project"
+title: "TSA project - Forecasting financial instrument prices with VECM and ARIMA models"
 author: "Nadim Muhammad & Michał Kulbat"
-date: "2023-05-25"
-output: html_document
-html:
-    css: styles.css
+output: 
+  html_document:
+    theme: spacelab
+    highlight: tango
     toc: true
-    toc-depth: 2
-    toc-expand: 3
-    toc-title: Contents
-    toc-location: body
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
 ---
 
 **Importing the libraries**
@@ -32,8 +31,6 @@ library(Metrics)
 library(TSEwgt)
 library(tidyverse)
 ```
-
-############################################################### 
 
 # 1.Getting data
 
@@ -66,7 +63,7 @@ data_test_xts <- xts(data_test[, -1], order.by = data_test$X)
 
 # 2.Choosing time series
 
-```{r}
+```{r warning=FALSE}
 plot(data_train_xts, col = c("black", "blue", "red", "purple", "green", "pink", "brown", "cyan", "magenta", "coral"), major.ticks = "years", grid.ticks.on = "years", grid.ticks.lty = 3, main = "Plotted time series", legend.loc = "bottomleft")
 ```
 
@@ -153,8 +150,12 @@ summary(cointegration)
 testdf(variable = residuals(cointegration), max.augmentations = 3)
 ```
 
-#Coefficients: \# Estimate Std. Error t value Pr(\>\|t\|)\
-\#(Intercept) 152.195497 0.107127 1420.7 \<2e-16 ***\# second -0.271123 0.002145 -126.4 \<2e-16*** \# The cointegrating vector is: 1, -152.195497, 0.271123 \# which defines the cointegrating relationship as: \# residuals = 1 \* first - 152.195497 + 0.271123 \* second
+Coefficients: 
+Estimate Std. Error t value Pr(>|t|)\
+(Intercept) 152.195497 0.107127 1420.7 <2e-16 ***
+second -0.271123 0.002145 -126.4 <2e-16***
+The cointegrating vector is: 1, -152.195497, 0.271123 which defines the cointegrating relationship as:
+residuals = 1 * first - 152.195497 + 0.271123 * second
 
 ```{r}
 cointegrated_series <- lag.xts(residuals(cointegration))
@@ -170,7 +171,7 @@ testdf(variable = cointegrated_series, max.augmentations = 3)
 
 ############################################################# 
 
-# 3 ARIMA models
+# 3. ARIMA models
 
 ############################################################### 
 
@@ -220,7 +221,7 @@ plot(bj_pvalues, type='l')
 abline(h=0.05, col='red', type='l')
 ```
 
-The residuals are not white noise
+The residuals are **not** white noise
 
 ### ARIMA(7,1,3)
 
@@ -309,7 +310,7 @@ plot_ACF_PACF_resids(arima7126)
 
 lag 26 is significant, lets leave it for now
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 bj_pvalues = c()
 for(i in c(1:100)){
   bj = Box.test(resid(arima7126), type = "Ljung-Box", lag = i)
@@ -341,7 +342,7 @@ plot_ACF_PACF_resids(arima613fixed)
 
 we still have some other lags significant
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 bj_pvalues = c()
 for(i in c(1:100)){
   bj = Box.test(resid(arima613fixed), type = "Ljung-Box", lag = i)
@@ -351,7 +352,7 @@ plot(bj_pvalues, type='l')
 abline(h=0.05, col='red', type='l')
 ```
 
-**residuals are not a white noise!!!**
+residuals are **not** a white noise
 
 ### arima7115 with nonsignificant variables set to 0 (expect ma10) (its arima5115)
 
@@ -373,7 +374,7 @@ plot_ACF_PACF_resids(arima5115fixed)
 
 we still have some other lags significant
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 bj_pvalues = c()
 for(i in c(1:100)){
   bj = Box.test(resid(arima5115fixed), type = "Ljung-Box", lag = i)
@@ -383,7 +384,7 @@ plot(bj_pvalues, type='l')
 abline(h=0.05, col='red', type='l')
 ```
 
-residuals are not white noise!!!!
+residuals are **not** white noise!!!!
 
 ### lets try arima7126 with nonsignificant variables set to 0 (its arima614) lets include ma2 and ma4
 
@@ -405,7 +406,7 @@ plot_ACF_PACF_resids(arima614fixed)
 
 lag 15,20,21,26 on significance line
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 bj_pvalues = c()
 for(i in c(1:100)){
   bj = Box.test(resid(arima614fixed), type = "Ljung-Box", lag = i)
@@ -437,7 +438,7 @@ plot_ACF_PACF_resids(arima613fixed)
 
 lag 4, 15, 20, 21 and 26 on line
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 bj_pvalues = c()
 for(i in c(1:100)){
   bj = Box.test(resid(arima613fixed), type = "Ljung-Box", lag = i)
@@ -469,7 +470,7 @@ plot_ACF_PACF_resids(arima613fixed2)
 
 lag 15, 20, 21 on line
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 bj_pvalues = c()
 for(i in c(1:100)){
   bj = Box.test(resid(arima613fixed2), type = "Ljung-Box", lag = i)
@@ -531,7 +532,7 @@ arima614fixed_forecast_data_xts <- xts(arima614fixed_forecast_data, order.by = d
 
 # 5 Forecast visualization
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 data_all_xts <- rbind(data_train_xts[,3], data_test_xts[,3])
 names(data_all_xts) <- "first"
 
@@ -585,7 +586,7 @@ plot_ACF_PACF_resids(arima111_second)
 
 ACF and PACF plots shows that some lags are still significant
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 bj_pvalues = c()
 for(i in c(1:100)){
   bj = Box.test(resid(arima111_second), type = "Ljung-Box", lag = i)
@@ -595,7 +596,7 @@ plot(bj_pvalues, type='l')
 abline(h=0.05, col='red', type='l')
 ```
 
-residuals are not white noise
+residuals are **not** white noise
 
 ### ARIMA(3,1,3)
 
@@ -613,7 +614,7 @@ plot_ACF_PACF_resids(arima313_second)
 
 lags 15, 18, 20 are still significant
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 bj_pvalues = c()
 for(i in c(1:100)){
   bj = Box.test(resid(arima313_second), type = "Ljung-Box", lag = i)
@@ -641,7 +642,7 @@ plot_ACF_PACF_resids(arima1513_second)
 
 lags 17, 20, 26 are still significant
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 bj_pvalues = c()
 for(i in c(1:100)){
   bj = Box.test(resid(arima1513_second), type = "Ljung-Box", lag = i)
@@ -671,7 +672,7 @@ plot_ACF_PACF_resids(arima312_second)
 
 lags 15, 18, 20, 26 are still significant
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 bj_pvalues = c()
 for(i in c(1:100)){
   bj = Box.test(resid(arima312_second), type = "Ljung-Box", lag = i)
@@ -702,7 +703,7 @@ plot_ACF_PACF_resids(arima1513_fixed_second)
 
 lag 20 is still significant, lag 6 and 17 on line
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 bj_pvalues = c()
 for(i in c(1:100)){
   bj = Box.test(resid(arima1513_fixed_second), type = "Ljung-Box", lag = i)
@@ -733,7 +734,7 @@ plot_ACF_PACF_resids(arima1513_fixed2_second)
 
 lags 1, 6, 20, 26 are still significant
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 bj_pvalues = c()
 for(i in c(1:100)){
   bj = Box.test(resid(arima1513_fixed2_second), type = "Ljung-Box", lag = i)
@@ -790,7 +791,7 @@ arima313_second_forecast_data_xts <- xts(arima313_second_forecast_data, order.by
 
 # VISUALIZATION OF THE SECOND TIME SERIES
 
-```{r}
+```{r warning=FALSE}
 data_all_second_xts <- rbind(data_train_xts[,9], data_test_xts[,9])
 names(data_all_second_xts) <- "second"
 
@@ -898,7 +899,7 @@ All but one (FPE IC) shows that 6 lags are the best
 
 With ACF and PACF we showed that there is no seasonality detected
 
-## Check season = 31, 30, 7
+### Check season = 31, 30, 7
 
 ```{r}
 VAR_model_6_lags <- VAR(chosen_ones[,1:2],
@@ -972,7 +973,7 @@ Both models show no autocorrelation in residuals
 
 ## AIC/BIC
 
-```{r}
+```{r warning=FALSE}
 AIC(VAR_model_6_lags, VAR_model_8_lags)
 BIC(VAR_model_6_lags, VAR_model_8_lags)
 ```
@@ -1084,7 +1085,7 @@ plot(serial.test(VECM_model.asVAR))
 
 lets plot EDF (Empirical Distribution Function) better
 
-```{r}
+```{r warning=FALSE}
 VECM_model.asVAR %>%
   residuals() %>%
   as_tibble() %>%
@@ -1103,7 +1104,7 @@ VECM_model.asVAR %>%
   )
 ```
 
-```{r}
+```{r warning=FALSE}
 VECM_model.asVAR %>%
   residuals() %>%
   as_tibble() %>%
@@ -1206,7 +1207,7 @@ plot(forecasts_first_all["2020-11/",],
      legend.loc = "bottomleft")
 ```
 
-#Second
+### Second
 ```{r}
 plot(forecasts_second_all["2020-11/",], 
      major.ticks = "years", 
