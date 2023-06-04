@@ -19,12 +19,10 @@ library(tidyverse)
 #1. Getting data
 
 
-<<<<<<< HEAD
-setwd("C:/Users/micha/OneDrive/Dokumenty/GitHub/TSA-project/")
-=======
+
 setwd("C:\\Users\\nm412083\\Desktop\\Time Series Analysis\\project\\TSA-project-main\\TSA-project")
 
->>>>>>> 651b4c3221bc6026079d48a03886a4d28d33481e
+
 
 
 options(scipen = 10)
@@ -638,8 +636,8 @@ summary(ecm_model)
 # the `first` in the **short run** will decrease by 0.03568.
 
 # The long run relationship is described by the parameter 
-# 0.271123 from the cointegrating relationship: so if `ppi` 
-# increases by 1 in the LONG RUN `cpi` will increase by 0.271123.
+# 0.271123 from the cointegrating relationship: so if `first` 
+# increases by 1 in the LONG RUN `second` will increase by 0.271123.
 
 # The value of -0.55365 is the estimate of the *adjustment 
 # coefficient*. As expected, its sign is negative and 
@@ -786,7 +784,7 @@ VECM_model <- cajorls(johan.test.trace, # defined specification
                                      r = 1) # number of cointegrating vectors
 
 summary(VECM_model$rlm)
-#only etc1 not significant in first equation
+#only etc1 and constant not significant in first equation
 
 VECM_model$beta
 
@@ -841,9 +839,8 @@ VECM_model.asVAR %>%
                             sd = sd(residuals(VECM_model.asVAR)[, 1]))) +
   theme_bw() + 
   labs(
-    title = "Density of PPI residuals", 
-    y = "", x = "",
-    caption = "source: own calculations"
+    title = "Density of 'first' residuals", 
+    y = "", x = ""
   )
 
 VECM_model.asVAR %>%
@@ -858,9 +855,8 @@ VECM_model.asVAR %>%
                             sd = sd(residuals(VECM_model.asVAR)[, 2]))) +
   theme_bw() + 
   labs(
-    title = "Density of CPI residuals", 
-    y = "", x = "",
-    caption = "source: own calculations"
+    title = "Density of 'second' residuals", 
+    y = "", x = ""
   )
 
 

@@ -822,7 +822,7 @@ diff_second is not statistically significant, but lets leave it
 
 The parameter -0.03568 describes a short term relationship between `first` and `second`, so if `second` increases by 1 then the `first` in the *short run* will decrease by 0.03568.
 
-The *long run* relationship is described by the parameter 0.271123 from the cointegrating relationship: so if `ppi` increases by 1 in the LONG RUN `cpi` will increase by 0.271123.
+The *long run* relationship is described by the parameter 0.271123 from the cointegrating relationship: so if `first` increases by 1 in the LONG RUN `second` will increase by 0.271123.
 
 The value of -0.55365 is the estimate of the *adjustment coefficient*. As expected, its sign is negative and this value means that about 55.37% of the unexpected error (increase in gap) will be corrected in the next period, so any unexpected deviation should be corrected finally on average within about 1.8 periods.
 
@@ -1025,7 +1025,7 @@ VECM_model <- cajorls(johan.test.trace, # defined specification
 summary(VECM_model$rlm)
 ```
 
-only etc1 not significant in first equation
+only etc1 and constant not significant in first equation
 
 ```{r}
 VECM_model$beta
@@ -1092,9 +1092,8 @@ VECM_model.asVAR %>%
                             sd = sd(residuals(VECM_model.asVAR)[, 1]))) +
   theme_bw() + 
   labs(
-    title = "Density of PPI residuals", 
-    y = "", x = "",
-    caption = "source: own calculations"
+    title = "Density of 'first' residuals", 
+    y = "", x = ""
   )
 ```
 
@@ -1111,9 +1110,8 @@ VECM_model.asVAR %>%
                             sd = sd(residuals(VECM_model.asVAR)[, 2]))) +
   theme_bw() + 
   labs(
-    title = "Density of CPI residuals", 
-    y = "", x = "",
-    caption = "source: own calculations"
+    title = "Density of 'second' residuals", 
+    y = "", x = ""
   )
 ```
 
