@@ -116,7 +116,7 @@ chosen_ones$diff_second <- diff.xts(chosen_ones$second)
 ```
 
 ```{r warning=FALSE}
-testdf(variable = chosen_ones$first, max.augmentations = 3)
+testdf(variable = chosen_ones$diff_first, max.augmentations = 3)
 ```
 
 ```{r warning=FALSE}
@@ -143,13 +143,12 @@ summary(cointegration)
 testdf(variable = residuals(cointegration), max.augmentations = 3)
 ```
 
-
-Coefficients: \
-Estimate Std. Error t value Pr(>|t|)\
-(Intercept) 152.195497 0.107127 1420.7 <2e-16 *** \
-second -0.271123 0.002145 -126.4 <2e-16*** \
-The cointegrating vector is: 1, -152.195497, 0.271123 which defines the cointegrating relationship as: \
-residuals = 1 * first - 152.195497 + 0.271123 * second \
+Coefficients:\
+Estimate Std. Error t value Pr(\>\|t\|)\
+(Intercept) 152.195497 0.107127 1420.7 \<2e-16 \*\*\*\
+second -0.271123 0.002145 -126.4 \<2e-16\*\*\*\
+The cointegrating vector is: 1, -152.195497, 0.271123 which defines the cointegrating relationship as:\
+residuals = 1 \* first - 152.195497 + 0.271123 \* second\
 
 ```{r}
 cointegrated_series <- lag.xts(residuals(cointegration))
@@ -863,7 +862,7 @@ for(i in 1:5){
 
 # VAR MODELS
 
-### Select VAR model with proper lag legnht
+### Select VAR model with proper lag lenght
 
 ```{r}
 VARselect(chosen_ones[,1:2], lag.max = 10) %>%
@@ -1031,8 +1030,7 @@ only etc1 and constant not significant in first equation
 VECM_model$beta
 ```
 
-We can reparametrize the VEC model into VAR 
-(here we use the specification object):
+We can reparametrize the VEC model into VAR (here we use the specification object):
 
 ```{r}
 VECM_model.asVAR <- vec2var(johan.test.trace, r = 1)
@@ -1144,6 +1142,7 @@ VECM_model.asVAR.fore$fcst$second
 ```
 
 ### Forecasts
+
 ```{r}
 VECM_first_forecast <- xts(VECM_model.asVAR.fore$fcst$first[,-4], order.by = data_test$X)
 
@@ -1200,6 +1199,7 @@ plot(forecasts_first_all["2020-11/",],
 ```
 
 ### Second
+
 ```{r}
 plot(forecasts_second_all["2020-11/",], 
      major.ticks = "years", 
@@ -1225,6 +1225,7 @@ errors_first_ts <- {}
 ```
 
 ### ARIMA(6,1,3)
+
 ```{r}
 errors_first_ts$arima613mae   <-  mae(forecasts_first_all[971:1000,1],forecasts_first_all$arima613.mean)
 errors_first_ts$arima613mse   <-  mse(forecasts_first_all[971:1000,1],forecasts_first_all$arima613.mean)
@@ -1234,6 +1235,7 @@ errors_first_ts$arima613amape <-  mean(abs((forecasts_first_all[971:1000,1] - fo
 ```
 
 ### ARIMA(7,1,3)
+
 ```{r}
 errors_first_ts$arima713mae   <-  mae(forecasts_first_all[971:1000,1],forecasts_first_all$arima713.mean)
 errors_first_ts$arima713mse   <-  mse(forecasts_first_all[971:1000,1],forecasts_first_all$arima713.mean)
@@ -1253,6 +1255,7 @@ errors_first_ts$arima614amape <-  mean(abs((forecasts_first_all[971:1000,1] - fo
 ```
 
 ### VECM
+
 ```{r}
 errors_first_ts$VECM_mae   <-  mae(forecasts_first_all[971:1000,1],forecasts_first_all$first_fore)
 errors_first_ts$VECM_mse   <-  mse(forecasts_first_all[971:1000,1],forecasts_first_all$first_fore)
@@ -1264,48 +1267,57 @@ errors_first_ts
 ```
 
 ### MAE
+
 ```{r}
 errors_first_ts$arima613mae
 errors_first_ts$arima713mae
 errors_first_ts$arima614mae
 errors_first_ts$VECM_mae
 ```
+
 arima(6,1,4) the best in terms of MAE
 
 ### MSE
+
 ```{r}
 errors_first_ts$arima613mse
 errors_first_ts$arima713mse
 errors_first_ts$arima614mse
 errors_first_ts$VECM_mse
 ```
+
 arima(6,1,4) the best in terms of MSE
 
 ### MAPE
+
 ```{r}
 errors_first_ts$arima613mape
 errors_first_ts$arima713mape
 errors_first_ts$arima614mape
 errors_first_ts$VECM_mape
 ```
+
 arima(6,1,4) the best in terms of MAPE
 
 ### AMAPE
+
 ```{r}
 errors_first_ts$arima613amape
 errors_first_ts$arima713amape
 errors_first_ts$arima614amape
 errors_first_ts$VECM_amape
 ```
+
 arima(6,1,4) the best in terms of AMAPE
 
-
 ## SECOND
+
 ```{r}
 errors_second_ts <- {}
 ```
 
 ### ARIMA(15,1,3) fixed
+
 ```{r}
 errors_second_ts$arima1513_fixed_mae   <-  mae(forecasts_second_all[971:1000,1],forecasts_second_all$arima1513_fixed.mean)
 errors_second_ts$arima1513_fixed_mse   <-  mse(forecasts_second_all[971:1000,1],forecasts_second_all$arima1513_fixed.mean)
@@ -1315,6 +1327,7 @@ errors_second_ts$arima1513_fixed_amape <-  mean(abs((forecasts_second_all[971:10
 ```
 
 ### ARIMA(15,1,3) fixed2
+
 ```{r}
 errors_second_ts$arima1513_fixed2_mae   <-  mae(forecasts_second_all[971:1000,1],forecasts_second_all$arima1513_fixed2.mean)
 errors_second_ts$arima1513_fixed2_mse   <-  mse(forecasts_second_all[971:1000,1],forecasts_second_all$arima1513_fixed2.mean)
@@ -1324,6 +1337,7 @@ errors_second_ts$arima1513_fixed2_amape <-  mean(abs((forecasts_second_all[971:1
 ```
 
 ### ARIMA(3,1,3)
+
 ```{r}
 errors_second_ts$arima313_mae   <-  mae(forecasts_second_all[971:1000,1],forecasts_second_all$arima313.mean)
 errors_second_ts$arima313_mse   <-  mse(forecasts_second_all[971:1000,1],forecasts_second_all$arima313.mean)
@@ -1333,6 +1347,7 @@ errors_second_ts$arima313_amape <-  mean(abs((forecasts_second_all[971:1000,1] -
 ```
 
 ### VECM
+
 ```{r}
 errors_second_ts$VECM_mae   <-  mae(forecasts_second_all[971:1000,1],forecasts_second_all$second_fore)
 errors_second_ts$VECM_mse   <-  mse(forecasts_second_all[971:1000,1],forecasts_second_all$second_fore)
@@ -1342,38 +1357,55 @@ errors_second_ts$VECM_amape <-  mean(abs((forecasts_second_all[971:1000,1] - for
 ```
 
 ### MAE
+
 ```{r}
 errors_second_ts$arima1513_fixed_mae
 errors_second_ts$arima1513_fixed2_mae
 errors_second_ts$arima313_mae
 errors_second_ts$VECM_mae
 ```
+
 ARIMA(15,1,3) fixed best in terms of MAE
 
-
 ### MSE
+
 ```{r}
 errors_second_ts$arima1513_fixed_mse
 errors_second_ts$arima1513_fixed2_mse
 errors_second_ts$arima313_mse
 errors_second_ts$VECM_mse
 ```
+
 ARIMA(15,1,3) fixed best in terms of MSE
 
 ### MAPE
+
 ```{r}
 errors_second_ts$arima1513_fixed_mape
 errors_second_ts$arima1513_fixed2_mape
 errors_second_ts$arima313_mape
 errors_second_ts$VECM_mape
 ```
+
 ARIMA(15,1,3) fixed best in terms of MAPE
 
 ### AMAPE
+
 ```{r}
 errors_second_ts$arima1513_fixed_amape
 errors_second_ts$arima1513_fixed2_amape
 errors_second_ts$arima313_amape
 errors_second_ts$VECM_amape
 ```
+
 ARIMA(15,1,3) fixed best in terms of AMAPE
+
+### Conclusion
+
+We chose the third and ninth time series to model and forecast using ARIMA and VECM. Both of them are integrated of order 1 and we found their cointegrated vector. When analyzing ACF and PACF graphs to chose proper orders of q and p for ARIMA models, we concluded that in those time series there are no seasonal patterns, which was later confirmed when by statistically insignificance in seasonal variables in VAR models (there were some statistical evidence of seasonality, but only for single seasonal variables and in one time series mostly, they were also near the significance line (p-value of 0.05)).
+
+For ARIMA models we followed Box-Jenkins procedure, but we also started by creating ARIMA(1,1,1) model for both time series in order to set up some benchmark. When following Box-Jenkins procedure, we tried to have low orders of p and q (so the model will be more theoretical), but when ACF and PACF showed some correlations, we also check higher orders of p and q (which made the models more atheoretical).
+
+For VECM, firstly we checked for Granger causality, from which we could conclude that both time series influences (causes) each other. Secondly, we checked information criterias in order to select the proper lag lenght of the VAR model, which will be used to create VECM model. We also plotted Impulse Response Function (IRF) and Forecast Error Variance Decomposition (FEVD).
+
+After selecting models with the smallest values of Information Criterias, we forecasted 30 next periods and plotted them with they upper and lower bands (95%), and calculated ex-post errors (MAE, MSE, MAPE, AMAPE). For the third time series the ARIMA(6,1,4) turn out to be the best (smallest ex-post errors), and for ninth time series, the ARIMA(15,1,3) turned out to be the best (smallest ex-post errors). For those time series it turns out that ARIMA models are performing better than VECM.
