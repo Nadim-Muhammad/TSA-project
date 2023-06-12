@@ -978,11 +978,31 @@ AIC prefers model with 8 lags, but BIC prefers model with 6 lags, lets stick to 
 ```{r}
 plot(irf(VAR_model_6_lags, n.ahead = 36))
 ```
-First:
-the impact in first is fairly stable and showing little variation from 0 until period 16. 
 
-Second:
-1-12 initial shock in impact for second up to 12 period, since then the impact stays stable at around 0,05.
+
+**First:**
+
+**from first:**
+
+- 0-3 shows initial shock in impact with downward trend until near impact level of 0.
+
+- 3-10 shows variation in impact with following movements: 3-5 upward, 5-6 downward, 6-7 upward, 7-9 downward, 9-10 upward.
+
+- The impact in first is fairly stable from period 10 and shows little variation from 0,5. 
+
+**from second:**
+
+- Shock in impact with downward trend form 2 up to 10 period, since then the impact stays relatively stable with a low upward trend at around -1,5.
+
+**Second:**
+
+**from first:**
+
+- The impact in first is fairly stable and showing little variation from 0 until period 16. 
+
+**from second:**
+
+- 0-12 initial shock in impact for second up to 12 period, since then the impact stays stable at around 0,05.
 
 
 ## FEVD
@@ -991,15 +1011,22 @@ Second:
 plot(fevd(VAR_model_6_lags, n.ahead = 36))
 ```
 
-First:
+**First:**
+
 - Whole variation is from the first time series.
-- the variation seems to be constant for first and for second
+
+- the variation seems to be constant for first and for second.
+
 - Overall the first shocks have much stronger impact on future values of first and second.
 
-Second:
-- In the initial periods from 1-3 whole variation is explained by second time series
-- The contribution of first to the variation for second changes fairly rapidly from 4-14
-- Afterwards the contribution of first to variation levels off at around 95%
+**Second:**
+
+- In the initial periods from 1-3 whole variation is explained by second time series.
+
+- The contribution of first to the variation for second changes fairly rapidly from 4-14.
+
+- Afterwards the contribution of first to variation levels off at around 95%.
+
 - Overall except initial state from 1-7 the first shocks have much stronger impact on future values of first and second.
 
 ## JOHANSON COINTEGRATION TEST
@@ -1064,7 +1091,18 @@ Based on the reparametrized model, we can calculate and plot Impulse Response Fu
 ```{r}
 plot(irf(VECM_model.asVAR, n.ahead = 36))
 ```
-The results are pretty similar to the earlier `VAR(6)` model with only difference being slightly decreased level of impact in first making it slightly below zero and higher result in second leaving it slightly above 0,05.
+
+The results are pretty similar to the earlier `VAR(6)` model with only difference being:
+
+**for first:**
+
+- In second there is a difference where from 24 period the results are completely stable at impact level around -1,5
+
+**for second:**
+
+- Slightly decreased level of impact in first making it  below zero 
+
+- Higher result in second leaving it slightly above 0,05.
 
 
 
