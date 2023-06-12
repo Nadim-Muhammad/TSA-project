@@ -35,7 +35,7 @@ library(tidyverse)
 # 1.Getting data
 
 ```{r}
-setwd("C:\\Users\\Administrator\\OneDrive\\Pulpit\\studia\\MAGISTERSKIE\\Time Series Analysis\\project\\TSA-project")
+setwd("C:\\Users\\micha\\OneDrive\\Dokumenty\\QF\\GitHub\\TSA-project")
 
 options(scipen = 10)
 
@@ -978,12 +978,29 @@ AIC prefers model with 8 lags, but BIC prefers model with 6 lags, lets stick to 
 ```{r}
 plot(irf(VAR_model_6_lags, n.ahead = 36))
 ```
+First:
+the impact in first is fairly stable and showing little variation from 0 until period 16. 
+
+Second:
+1-12 initial shock in impact for second up to 12 period, since then the impact stays stable at around 0,05.
+
 
 ## FEVD
 
-```{r}
+```{r warning=FALSE}
 plot(fevd(VAR_model_6_lags, n.ahead = 36))
 ```
+
+First:
+- Whole variation is from the first time series.
+- the variation seems to be constant for first and for second
+- Overall the first shocks have much stronger impact on future values of first and second.
+
+Second:
+- In the initial periods from 1-3 whole variation is explained by second time series
+- The contribution of first to the variation for second changes fairly rapidly from 4-14
+- Afterwards the contribution of first to variation levels off at around 95%
+- Overall except initial state from 1-7 the first shocks have much stronger impact on future values of first and second.
 
 ## JOHANSON COINTEGRATION TEST
 
@@ -1047,6 +1064,9 @@ Based on the reparametrized model, we can calculate and plot Impulse Response Fu
 ```{r}
 plot(irf(VECM_model.asVAR, n.ahead = 36))
 ```
+The results are pretty similar to the earlier `VAR(6)` model with only difference being slightly decreased level of impact in first making it slightly below zero and higher result in second leaving it slightly above 0,05.
+
+
 
 We can also perform variance decomposition:
 
